@@ -1,6 +1,15 @@
 {
   "id": "generator-1.19.4",
+  "supportedversions": [202400100000],
+  "weight": 0,
   "info": {
-    "name": "Minecraft 1.19.4 Java Edition generator"
+    "name": "Minecraft Forge 1.19.4 Java Edition/Datapack Generator",
+    "version": "1.0",
+    "description": "Minecraft Forge 1.19.4 Java Edition/Datapack Generator",
+    "author": "_Spectrall",
+    "credits": "",
+    "dependencies":  [],
+    "updateJSONURL": "https://raw.githubusercontent.com/Spectrall368/Generator-1.19.4/2024.1/update.json",
+    "pluginPageID": 99914
   }
 }
