@@ -1,6 +1,6 @@
 name: Minecraft Forge for @minecraft (@buildfileversion)
-status: lts
-buildfileversion: 45.2.0
+status: deprecated
+buildfileversion: 45.2.8
 
 import:
   - datapack-1.19.4
