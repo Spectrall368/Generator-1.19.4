@@ -215,8 +215,6 @@ public class ${name}Block extends <#if data.plantType == "normal">Flower<#elseif
 
 	<@onBlockAdded data.onBlockAdded, false, 0/>
 
-	<@onBlockTick data.onTickUpdate, false, 0/>
-
 	<#if data.plantType == "growapable" || hasProcedure(data.onTickUpdate)>
 	@Override public void randomTick(BlockState blockstate, ServerLevel world, BlockPos pos, RandomSource random) {
 		<#if data.plantType == "growapable">
