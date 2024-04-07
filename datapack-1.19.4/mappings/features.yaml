@@ -1,3 +1,4 @@
+
 _default:
   - NoOpFeature
   - NoneFeatureConfiguration
@@ -103,6 +104,18 @@ feature_tree_spruce:
   - TreeConfiguration
   - "minecraft:tree"
 feature_tree_pine:
+  - TreeFeature
+  - TreeConfiguration
+  - "minecraft:tree"
+feature_tree_azalea:
+  - TreeFeature
+  - TreeConfiguration
+  - "minecraft:tree"
+feature_tree_cherry:
+  - TreeFeature
+  - TreeConfiguration
+  - "minecraft:tree"
+feature_tree_mangrove:
   - TreeFeature
   - TreeConfiguration
   - "minecraft:tree"
