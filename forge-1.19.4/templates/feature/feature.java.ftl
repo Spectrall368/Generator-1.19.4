@@ -31,9 +31,7 @@
 <#-- @formatter:off -->
 <#include "../procedures.java.ftl">
 <#include "../mcitems.ftl">
-
 package ${package}.world.features;
-
 <#assign configuration = generator.map(featuretype, "features", 1)>
 
 <#compress>
@@ -45,14 +43,13 @@ public class ${name}Feature extends ${generator.map(featuretype, "features")} {
 
 	public boolean place(FeaturePlaceContext<${configuration}> context) {
 		<#if hasProcedure(data.generateCondition)>
-		WorldGenLevel world = context.level();
+		Level world = context.level().getLevel();
 		int x = context.origin().getX();
 		int y = context.origin().getY();
 		int z = context.origin().getZ();
 		if (!<@procedureOBJToConditionCode data.generateCondition/>)
 			return false;
 		</#if>
-
 		return super.place(context);
 	}
 }</#compress>
