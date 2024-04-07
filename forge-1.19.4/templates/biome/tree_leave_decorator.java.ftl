@@ -82,7 +82,7 @@ package ${package}.world.features.treedecorators;
     }
 
     private static void addVine(BlockPos pos, Direction direction, TreeDecorator.Context context) {
-	context.setBlock(blockpos, oriented(${mappedBlockToBlockStateCode(data.treeVines)}, direction));
+	context.setBlock(pos, oriented(${mappedBlockToBlockStateCode(data.treeVines)}, direction));
         int i = 4;
         for(BlockPos blockpos = pos.below(); context.isAir(blockpos) && i > 0; --i) {
 		context.setBlock(blockpos, ${mappedBlockToBlockStateCode(data.treeVines)});
