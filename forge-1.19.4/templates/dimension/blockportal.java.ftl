@@ -29,9 +29,7 @@
 -->
 
 <#-- @formatter:off -->
-
 <#include "../procedures.java.ftl">
-
 package ${package}.block;
 
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
@@ -43,20 +41,18 @@ public class ${name}PortalBlock extends NetherPortalBlock {
 				.strength(-1.0F).sound(SoundType.GLASS).lightLevel(s -> ${data.portalLuminance}).noLootTable());
 	}
 
-	<#if hasProcedure(data.onPortalTickUpdate)>
-	@Override public void tick(BlockState blockstate, ServerLevel world, BlockPos pos, RandomSource random) {
-		<@procedureCode data.onPortalTickUpdate, {
-			"x": "pos.getX()",
-			"y": "pos.getY()",
-			"z": "pos.getZ()",
-			"world": "world",
-			"blockstate": "blockstate"
-		}/>
-	}
-	</#if>
-
 	<#-- Prevent ZOMBIFIED_PIGLINs from spawning -->
 	@Override public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+		<#-- Do not call super to prevent ZOMBIFIED_PIGLINs from spawning -->
+		<#if hasProcedure(data.onPortalTickUpdate)>
+			<@procedureCode data.onPortalTickUpdate, {
+				"x": "pos.getX()",
+				"y": "pos.getY()",
+				"z": "pos.getZ()",
+				"world": "world",
+				"blockstate": "blockstate"
+			}/>
+		</#if>
 	}
 
 	public static void portalSpawn(Level world, BlockPos pos) {
@@ -91,10 +87,7 @@ public class ${name}PortalBlock extends NetherPortalBlock {
 
 		<#if data.portalSound.toString()?has_content>
 		if (random.nextInt(110) == 0)
-			world.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-					ForgeRegistries.SOUND_EVENTS
-							.getValue(new ResourceLocation(("${data.portalSound}"))), SoundSource.BLOCKS, 0.5f,
-					random.nextFloat() * 0.4f + 0.8f);
+			world.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(("${data.portalSound}"))), SoundSource.BLOCKS, 0.5f, random.nextFloat() * 0.4f + 0.8f);
         </#if>
 	}
 
@@ -116,7 +109,5 @@ public class ${name}PortalBlock extends NetherPortalBlock {
 	private void teleportToDimension(Entity entity, BlockPos pos, ResourceKey<Level> destinationType) {
 		entity.changeDimension(entity.getServer().getLevel(destinationType), new ${name}Teleporter(entity.getServer().getLevel(destinationType), pos));
 	}
-
 }
-
 <#-- @formatter:on -->
