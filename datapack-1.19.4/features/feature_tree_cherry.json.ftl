@@ -34,8 +34,11 @@
       }
     },
     "branch_start_offset_from_top": {
-      "min_inclusive": -4,
-      "max_inclusive": -3
+      "type": "minecraft:uniform",
+      "value": {
+        "min_inclusive": -4,
+        "max_inclusive": -3
+      }
     }
   },
   "minimum_size": <@twoLayersFeatureSize limit=1 lower_size=0 upper_size=2/>,
