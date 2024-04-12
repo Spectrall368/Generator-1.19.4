@@ -1,4 +1,3 @@
-
 <#function mappedBlockToBlockStateCode mappedBlock>
     <#if mappedBlock?starts_with("/*@BlockState*/")>
         <#return mappedBlock?replace("/*@BlockState*/","")>
