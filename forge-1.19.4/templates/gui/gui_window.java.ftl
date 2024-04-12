@@ -144,8 +144,8 @@ public class ${name}Screen extends AbstractContainerScreen<${name}Menu> {
 		}
 
 		<#list data.getComponentsOfType("TextField") as component>
-				if(${component.getName()}.isFocused())
-					return ${component.getName()}.keyPressed(key, b, c);
+			if(${component.getName()}.isFocused())
+				return ${component.getName()}.keyPressed(key, b, c);
 		</#list>
 
 		return super.keyPressed(key, b, c);
@@ -167,10 +167,6 @@ public class ${name}Screen extends AbstractContainerScreen<${name}Menu> {
 				<#if hasProcedure(component.text)><@procedureOBJToStringCode component.text/><#else>Component.translatable("gui.${modid}.${registryname}.${component.getName()}")</#if>,
 				${component.gx(data.width)}, ${component.gy(data.height)}, ${component.color.getRGB()});
 		</#list>
-	}
-
-	@Override public void onClose() {
-		super.onClose();
 	}
 
 	@Override public void init() {
