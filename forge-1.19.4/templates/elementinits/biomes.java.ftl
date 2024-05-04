@@ -30,11 +30,9 @@
 
 <#-- @formatter:off -->
 <#include "../mcitems.ftl">
-
 /*
  *    MCreator note: This file will be REGENERATED on each build.
  */
-
 package ${package}.init;
 
 import com.mojang.datafixers.util.Pair;
@@ -42,7 +40,6 @@ import com.mojang.datafixers.util.Pair;
 <#assign spawn_overworld = biomes?filter(biome -> biome.spawnBiome)>
 <#assign spawn_overworld_caves = biomes?filter(biome -> biome.spawnInCaves)>
 <#assign spawn_nether = biomes?filter(biome -> biome.spawnBiomeNether)>
-
 @Mod.EventBusSubscriber public class ${JavaModName}Biomes {
 
 	@SubscribeEvent public static void onServerAboutToStart(ServerAboutToStartEvent event) {
@@ -63,7 +60,7 @@ import com.mojang.datafixers.util.Pair;
 					List<Pair<Climate.ParameterPoint, Holder<Biome>>> parameters = new ArrayList<>(noiseSource.parameters().values());
 
 					<#list spawn_overworld as biome>
-					parameters.add(new Pair<>(
+					addParameterPoint(parameters, new Pair<>(
 						new Climate.ParameterPoint(
 							Climate.Parameter.span(${biome.genTemperature.min}f, ${biome.genTemperature.max}f),
 							Climate.Parameter.span(${biome.genHumidity.min}f, ${biome.genHumidity.max}f),
@@ -75,7 +72,7 @@ import com.mojang.datafixers.util.Pair;
 						),
 						biomeRegistry.getHolderOrThrow(ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}", "${biome.getModElement().getRegistryName()}")))
 					));
-					parameters.add(new Pair<>(
+					addParameterPoint(parameters, new Pair<>(
 						new Climate.ParameterPoint(
 							Climate.Parameter.span(${biome.genTemperature.min}f, ${biome.genTemperature.max}f),
 							Climate.Parameter.span(${biome.genHumidity.min}f, ${biome.genHumidity.max}f),
@@ -90,7 +87,7 @@ import com.mojang.datafixers.util.Pair;
 					</#list>
 
 					<#list spawn_overworld_caves as biome>
-					parameters.add(new Pair<>(
+					addParameterPoint(parameters, new Pair<>(
 						new Climate.ParameterPoint(
 							Climate.Parameter.span(${biome.genTemperature.min}f, ${biome.genTemperature.max}f),
 							Climate.Parameter.span(${biome.genHumidity.min}f, ${biome.genHumidity.max}f),
@@ -118,7 +115,7 @@ import com.mojang.datafixers.util.Pair;
 						List<SurfaceRules.RuleSource> surfaceRules = new ArrayList<>(sequenceRuleSource.sequence());
 
 						<#list spawn_overworld_caves as biome>
-						surfaceRules.add(1, anySurfaceRule(
+						addSurfaceRule(surfaceRules, 1, anySurfaceRule(
 							ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}", "${biome.getModElement().getRegistryName()}")),
 							${mappedBlockToBlockStateCode(biome.groundBlock)},
 							${mappedBlockToBlockStateCode(biome.undergroundBlock)},
@@ -127,7 +124,7 @@ import com.mojang.datafixers.util.Pair;
 						</#list>
 
 						<#list spawn_overworld as biome>
-						surfaceRules.add(1, preliminarySurfaceRule(
+						addSurfaceRule(surfaceRules, 1, preliminarySurfaceRule(
 							ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}", "${biome.getModElement().getRegistryName()}")),
 							${mappedBlockToBlockStateCode(biome.groundBlock)},
 							${mappedBlockToBlockStateCode(biome.undergroundBlock)},
@@ -163,7 +160,7 @@ import com.mojang.datafixers.util.Pair;
 					List<Pair<Climate.ParameterPoint, Holder<Biome>>> parameters = new ArrayList<>(noiseSource.parameters().values());
 
 					<#list spawn_nether as biome>
-					parameters.add(new Pair<>(
+					addParameterPoint(parameters, new Pair<>(
 						new Climate.ParameterPoint(
 							Climate.Parameter.span(${biome.genTemperature.min}f, ${biome.genTemperature.max}f),
 							Climate.Parameter.span(${biome.genHumidity.min}f, ${biome.genHumidity.max}f),
@@ -175,7 +172,7 @@ import com.mojang.datafixers.util.Pair;
 						),
 						biomeRegistry.getHolderOrThrow(ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}", "${biome.getModElement().getRegistryName()}")))
 					));
-					parameters.add(new Pair<>(
+					addParameterPoint(parameters, new Pair<>(
 						new Climate.ParameterPoint(
 							Climate.Parameter.span(${biome.genTemperature.min}f, ${biome.genTemperature.max}f),
 							Climate.Parameter.span(${biome.genHumidity.min}f, ${biome.genHumidity.max}f),
@@ -203,8 +200,8 @@ import com.mojang.datafixers.util.Pair;
 						List<SurfaceRules.RuleSource> surfaceRules = new ArrayList<>(sequenceRuleSource.sequence());
 
 						<#list spawn_nether as biome>
-						surfaceRules.add(2, anySurfaceRule(
-								ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}", "${biome.getModElement().getRegistryName()}")),
+						addSurfaceRule(surfaceRules, 2, anySurfaceRule(
+							ResourceKey.create(Registries.BIOME, new ResourceLocation("${modid}", "${biome.getModElement().getRegistryName()}")),
 							${mappedBlockToBlockStateCode(biome.groundBlock)},
 							${mappedBlockToBlockStateCode(biome.undergroundBlock)},
 							${mappedBlockToBlockStateCode(biome.getUnderwaterBlock())}
@@ -274,6 +271,15 @@ import com.mojang.datafixers.util.Pair;
 	}
 	</#if>
 
-}
+	private static void addParameterPoint(List<Pair<Climate.ParameterPoint, Holder<Biome>>> parameters, Pair<Climate.ParameterPoint, Holder<Biome>> point) {
+		if (!parameters.contains(point))
+			parameters.add(point);
+	}
 
+	private static void addSurfaceRule(List<SurfaceRules.RuleSource> surfaceRules,  int index, SurfaceRules.RuleSource rule) {
+		if (!surfaceRules.contains(rule))
+			surfaceRules.add(index, rule);
+	}
+
+}
 <#-- @formatter:on -->
