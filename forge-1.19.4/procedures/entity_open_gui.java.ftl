@@ -3,9 +3,15 @@
 if(${input$entity} instanceof ServerPlayer _ent) {
 	BlockPos _bpos = ${toBlockPos(input$x,input$y,input$z)};
 	NetworkHooks.openScreen((ServerPlayer) _ent, new MenuProvider() {
+
 		@Override public Component getDisplayName() {
 			return Component.literal("${field$guiname}");
 		}
+
+		@Override public boolean shouldTriggerClientSideContainerClosingOnOpen() {
+        	return false;
+        }
+
 		@Override public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
 			return new ${(field$guiname)}Menu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos));
 		}

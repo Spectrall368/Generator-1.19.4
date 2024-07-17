@@ -31,26 +31,21 @@
 <#-- @formatter:off -->
 <#include "../mcitems.ftl">
 <#include "../procedures.java.ftl">
-
 package ${package}.entity;
 
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
-
 <#assign extendsClass = "PathfinderMob">
-
 <#if data.aiBase != "(none)" >
 	<#assign extendsClass = data.aiBase?replace("Enderman", "EnderMan")>
 <#else>
 	<#assign extendsClass = data.mobBehaviourType?replace("Mob", "Monster")?replace("Creature", "PathfinderMob")>
 </#if>
-
 <#if data.breedable>
 	<#assign extendsClass = "Animal">
 </#if>
-
 <#if (data.tameable && data.breedable)>
 	<#assign extendsClass = "TamableAnimal">
 </#if>
@@ -266,6 +261,16 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 	}
 	</#if>
 
+	<#if data.mobBehaviourType == "Raider">
+	@Override public SoundEvent getCelebrateSound() {
+		<#if data.raidCelebrationSound?has_content && data.raidCelebrationSound.getMappedValue()?has_content>
+		return ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("${data.raidCelebrationSound}"));
+		<#else>
+		return SoundEvents.EMPTY;
+		</#if>
+	}
+	</#if>
+
 	<#if hasProcedure(data.onStruckByLightning)>
 	@Override public void thunderHit(ServerLevel serverWorld, LightningBolt lightningBolt) {
 		super.thunderHit(serverWorld, lightningBolt);
@@ -292,7 +297,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 			}/>
 		</#if>
 
-		<#if data.flyingMob >
+		<#if data.flyingMob>
 			return false;
 		<#else>
 			return super.causeFallDamage(l, d, source);
@@ -903,7 +908,15 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 		<#if data.spawnInDungeons>
 			DungeonHooks.addDungeonMob(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(), 180);
 		</#if>
+
+		<#if data.mobBehaviourType == "Raider">
+		Raid.RaiderType.create("${registryname}", ${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(), new int[]{0, ${data.raidSpawnsCount[0]}, ${data.raidSpawnsCount[1]}, ${data.raidSpawnsCount[2]}, ${data.raidSpawnsCount[3]}, ${data.raidSpawnsCount[4]}, ${data.raidSpawnsCount[5]}, ${data.raidSpawnsCount[6]}});
+		</#if>
 	}
+
+	<#if data.mobBehaviourType == "Raider">
+   	@Override public void applyRaidBuffs(int num, boolean logic) {}
+   	</#if>
 
 	public static AttributeSupplier.Builder createAttributes() {
 		AttributeSupplier.Builder builder = Mob.createMobAttributes();
@@ -935,6 +948,5 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 
 		return builder;
 	}
-
 }
 <#-- @formatter:on -->

@@ -1,7 +1,7 @@
 <#--
  # MCreator (https://mcreator.net/)
  # Copyright (C) 2012-2020, Pylo
- # Copyright (C) 2020-2023, Pylo, opensource contributors
+ # Copyright (C) 2020-2024, Pylo, opensource contributors
  #
  # This program is free software: you can redistribute it and/or modify
  # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@
 
 <#-- @formatter:off -->
 <#include "procedures.java.ftl">
-
 package ${package}.client.particle;
 
 <#compress>
@@ -64,7 +63,9 @@ package ${package}.client.particle;
 		this.spriteSet = spriteSet;
 
 		this.setSize(${data.width}f, ${data.height}f);
-		<#if data.scale != 1>this.quadSize *= ${data.scale}f;</#if>
+		<#if data.scale.getFixedValue() != 1 && !hasProcedure(data.scale)>
+		this.quadSize *= ${data.scale.getFixedValue()}f;
+		</#if>
 
 		<#if (data.maxAgeDiff > 0)>
 		this.lifetime = (int) Math.max(1, ${data.maxAge} + (this.random.nextInt(${data.maxAgeDiff * 2}) - ${data.maxAgeDiff}));
@@ -101,6 +102,13 @@ package ${package}.client.particle;
 		return ParticleRenderType.PARTICLE_SHEET_${data.renderType};
 	}
 
+	<#if hasProcedure(data.scale)>
+	@Override public float getQuadSize(float scale) {
+		Level world = this.level;
+		return super.getQuadSize(scale) * (float) <@procedureOBJToConditionCode data.scale/>;
+	}
+	</#if>
+
 	@Override public void tick() {
 		super.tick();
 
@@ -123,7 +131,6 @@ package ${package}.client.particle;
 			this.remove();
 		</#if>
 	}
-
 }
 </#compress>
 <#-- @formatter:on -->
