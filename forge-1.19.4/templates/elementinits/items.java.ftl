@@ -137,7 +137,5 @@ public class ${JavaModName}Items {
 	}
 	</#compress>
 	</#if>
-
 }
-
 <#-- @formatter:on -->
