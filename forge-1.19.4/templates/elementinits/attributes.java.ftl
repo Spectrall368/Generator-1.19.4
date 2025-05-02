@@ -29,14 +29,12 @@
 -->
 
 <#-- @formatter:off -->
-
 /*
  *    MCreator note: This file will be REGENERATED on each build.
  */
-
 package ${package}.init;
 
-@Mod.EventBusSubscriber (bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ${JavaModName}Attributes {
 
 	public static final DeferredRegister<Attribute> REGISTRY = DeferredRegister.create(ForgeRegistries.ATTRIBUTES, ${JavaModName}.MODID);
@@ -67,5 +65,18 @@ public class ${JavaModName}Attributes {
 			</#if>
 		</#list>
 	}
+
+	<#assign playerAttributes = attributes?filter(a -> a.addToPlayers || a.addToAllEntities)>
+	<#if playerAttributes?size != 0>
+	@Mod.EventBusSubscriber public static class PlayerAttributesSync {
+		@SubscribeEvent public static void playerClone(PlayerEvent.Clone event) {
+			Player oldPlayer = event.getOriginal();
+			Player newPlayer = event.getEntity();
+			<#list playerAttributes as attribute>
+				newPlayer.getAttribute(${attribute.getModElement().getRegistryNameUpper()}.get()).setBaseValue(oldPlayer.getAttribute(${attribute.getModElement().getRegistryNameUpper()}.get()).getBaseValue());
+			</#list>
+		}
+	}
+	</#if>
 }
 <#-- @formatter:on -->
