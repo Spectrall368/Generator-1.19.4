@@ -38,23 +38,24 @@
  */
 package ${package}.init;
 
+<#compress>
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD) public class ${JavaModName}Tabs {
 
 	<#if customTabs?has_content>
 	@SubscribeEvent public static void buildTabContentsModded(CreativeModeTabEvent.Register event) {
 		<#list customTabs as customTab>
 			<#assign tab = w.getWorkspace().getModElementByName(customTab.replace("CUSTOM:", "")).getGeneratableElement()>
-			event.registerCreativeModeTab(new ResourceLocation("${modid}", "${tab.getModElement().getRegistryName()}"), builder -> builder
-						.title(Component.translatable("item_group.${modid}.${tab.getModElement().getRegistryName()}"))
-						.icon(() -> ${mappedMCItemToItemStackCode(tab.icon, 1)})
-						.displayItems((parameters, tabData) -> {
-							<#list tabMap.get("CUSTOM:" + tab.getModElement().getName()) as tabElement>
-							tabData.accept(${mappedMCItemToItem(tabElement)});
-							</#list>
-						})
-						<#if tab.showSearch>.withSearchBar()</#if>
+			    event.registerCreativeModeTab(new ResourceLocation("${modid}", "${tab.getModElement().getRegistryName()}"), builder -> builder
+				    .title(Component.translatable("item_group.${modid}.${tab.getModElement().getRegistryName()}"))
+					.icon(() -> ${mappedMCItemToItemStackCode(tab.icon, 1)})
+					.displayItems((parameters, tabData) -> {
+					    <#list tabMap.get("CUSTOM:" + tab.getModElement().getName()) as tabElement>
+						tabData.accept(${mappedMCItemToItem(tabElement)});
+						</#list>
+					})
+					<#if tab.showSearch>.withSearchBar()</#if>
 				);
-	    </#list>
+        </#list>
 	}
 	</#if>
 
@@ -72,4 +73,5 @@ package ${package}.init;
 	}
 	</#if>
 }
+</#compress>
 <#-- @formatter:on -->
