@@ -86,7 +86,6 @@ GenericWaiting: GenericWaitingScreen
 OnlineOptions: OnlineOptionsScreen
 Win: WinScreen
 Advancements: AdvancementsScreen
-EffectRenderingInventory: EffectRenderingInventoryScreen
 HangingSignEdit: HangingSignEditScreen
 ItemCombiner: ItemCombinerScreen
 Warning: WarningScreen
