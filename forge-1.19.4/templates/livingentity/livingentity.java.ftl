@@ -35,6 +35,7 @@ package ${package}.entity;
 
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
+<#assign interfaces = []>
 <#assign extendsClass = "PathfinderMob">
 <#if data.aiBase != "(none)" >
 	<#assign extendsClass = data.aiBase?replace("Enderman", "EnderMan")>
@@ -48,7 +49,14 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 	<#assign extendsClass = "TamableAnimal">
 </#if>
 
-public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements RangedAttackMob</#if> {
+<#if data.ranged>
+	<#assign interfaces += ["RangedAttackMob"]>
+</#if>
+<#if data.sensitiveToVibration>
+	<#assign interfaces += ["VibrationListener.VibrationListenerConfig"]>
+</#if>
+
+public class ${name}Entity extends ${extendsClass} <#if interfaces?size gt 0>implements ${interfaces?join(",")}</#if> {
 
 	<#list data.entityDataEntries as entry>
 		<#if entry.value().getClass().getSimpleName() == "Integer">
@@ -73,8 +81,12 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 		ServerBossEvent.BossBarColor.${data.bossBarColor}, ServerBossEvent.BossBarOverlay.${data.bossBarType});
 	</#if>
 
+	<#if data.sensitiveToVibration>
+	private final DynamicGameEventListener<VibrationListener> dynamicGameEventListener = new DynamicGameEventListener(new VibrationListener(new EntityPositionSource(this, this.getEyeHeight()), getListenerRadius(), this));
+	</#if>
+
 	public ${name}Entity(PlayMessages.SpawnEntity packet, Level world) {
-    	this(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(), world);
+    	this(${JavaModName}Entities.${REGISTRYNAME}.get(), world);
     }
 
 	public ${name}Entity(EntityType<${name}Entity> type, Level world) {
@@ -433,11 +445,14 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
     </#if>
 
 	<#if data.guiBoundTo?has_content>
-	private final ItemStackHandler inventory = new ItemStackHandler(${data.inventorySize}) {
+	private final ItemStackHandler inventory = new ItemStackHandler(${data.inventorySize})
+	<#if data.inventoryStackSize != 99>
+	{
 		@Override public int getSlotLimit(int slot) {
 			return ${data.inventoryStackSize};
 		}
-	};
+	}
+	</#if>;
 
 	private final CombinedInvWrapper combined = new CombinedInvWrapper(inventory, new EntityHandsInvWrapper(this), new EntityArmorInvWrapper(this));
 
@@ -459,7 +474,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 	}
     </#if>
 
-	<#if data.entityDataEntries?has_content || data.guiBoundTo?has_content>
+	<#if data.entityDataEntries?has_content || data.guiBoundTo?has_content || data.sensitiveToVibration>
 	@Override public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		<#list data.entityDataEntries as entry>
@@ -473,6 +488,11 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 		</#list>
 		<#if data.guiBoundTo?has_content>
 		compound.put("InventoryCustom", inventory.serializeNBT());
+		</#if>
+		<#if data.sensitiveToVibration>
+		VibrationListener.codec(this).encodeStart(NbtOps.INSTANCE, this.dynamicGameEventListener.getListener())
+			.resultOrPartial(e -> ${JavaModName}.LOGGER.error("Failed to encode vibration listener for ${name}: '{}'", e))
+			.ifPresent(listener -> compound.put("listener", listener));
 		</#if>
 	}
 
@@ -492,6 +512,21 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 		if (compound.get("InventoryCustom") instanceof CompoundTag inventoryTag)
 			inventory.deserializeNBT(inventoryTag);
 		</#if>
+		<#if data.sensitiveToVibration>
+		if (compound.contains("listener", Tag.TAG_COMPOUND)) {
+			VibrationListener.codec(this).parse(new Dynamic<>(NbtOps.INSTANCE, compound.getCompound("listener")))
+				.resultOrPartial(e -> ${JavaModName}.LOGGER.error("Failed to parse vibration listener for ${name}: '{}'", e))
+				.ifPresent(listener -> this.dynamicGameEventListener.updateListener(listener, this.level));
+		}
+		</#if>
+	}
+	</#if>
+
+	<#if data.sensitiveToVibration>
+	@Override public void updateDynamicGameEventListener(BiConsumer<DynamicGameEventListener<?>, ServerLevel> listenerConsumer) {
+		if (this.level instanceof ServerLevel serverLevel) {
+			listenerConsumer.accept(this.dynamicGameEventListener, serverLevel);
+		}
 	}
 	</#if>
 
@@ -612,9 +647,17 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 	}
     </#if>
 
- 	<#if hasPlayableAnimations>
+	<#if hasPlayableAnimations || data.sensitiveToVibration>
  	@Override public void tick() {
  		super.tick();
+
+		<#if data.sensitiveToVibration>
+		if (this.level instanceof ServerLevel serverLevel) {
+		    this.dynamicGameEventListener.getListener().tick(serverLevel);
+		}
+		</#if>
+
+		<#if hasPlayableAnimations>
  		if (this.level.isClientSide()) {
  			<#list data.animations as animation>
  				<#if !animation.walking>
@@ -632,6 +675,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
  				</#if>
  			</#list>
  		}
+		</#if>
  	}
  	</#if>
 
@@ -671,7 +715,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 	    @Override public void performRangedAttack(LivingEntity target, float flval) {
 			<#if data.rangedItemType == "Default item">
 				<#if !data.rangedAttackItem.isEmpty()>
-				${name}EntityProjectile entityarrow = new ${name}EntityProjectile(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}_PROJECTILE.get(), this, this.level);
+				${name}EntityProjectile entityarrow = new ${name}EntityProjectile(${JavaModName}Entities.${REGISTRYNAME}_PROJECTILE.get(), this, this.level);
 				<#else>
 				Arrow entityarrow = new Arrow(this.level, this);
 				</#if>
@@ -688,7 +732,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 
 	<#if data.breedable>
         @Override public AgeableMob getBreedOffspring(ServerLevel serverWorld, AgeableMob ageable) {
-			${name}Entity retval = ${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get().create(serverWorld);
+			${name}Entity retval = ${JavaModName}Entities.${REGISTRYNAME}.get().create(serverWorld);
 			retval.finalizeSpawn(serverWorld, serverWorld.getCurrentDifficultyAt(retval.blockPosition()), MobSpawnType.BREEDING, null, null);
 			return retval;
 		}
@@ -858,7 +902,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 	public static void init() {
 		<#if data.spawnThisMob>
 			<#if data.mobSpawningType == "creature">
-			SpawnPlacements.register(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(),
+			SpawnPlacements.register(${JavaModName}Entities.${REGISTRYNAME}.get(),
 					SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 				<#if hasProcedure(data.spawningCondition)>
 					(entityType, world, reason, pos, random) -> {
@@ -873,7 +917,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 				</#if>
 			);
 			<#elseif data.mobSpawningType == "ambient" || data.mobSpawningType == "misc">
-			SpawnPlacements.register(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(),
+			SpawnPlacements.register(${JavaModName}Entities.${REGISTRYNAME}.get(),
 					SpawnPlacements.Type.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 					<#if hasProcedure(data.spawningCondition)>
 					(entityType, world, reason, pos, random) -> {
@@ -887,7 +931,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 					</#if>
 			);
 			<#elseif data.mobSpawningType == "waterCreature" || data.mobSpawningType == "waterAmbient">
-			SpawnPlacements.register(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(),
+			SpawnPlacements.register(${JavaModName}Entities.${REGISTRYNAME}.get(),
 					SpawnPlacements.Type.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 					<#if hasProcedure(data.spawningCondition)>
 					(entityType, world, reason, pos, random) -> {
@@ -902,7 +946,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 					</#if>
 			);
 			<#elseif data.mobSpawningType == "undergroundWaterCreature">
-			SpawnPlacements.register(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(),
+			SpawnPlacements.register(${JavaModName}Entities.${REGISTRYNAME}.get(),
 					SpawnPlacements.Type.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 					<#if hasProcedure(data.spawningCondition)>
 					(entityType, world, reason, pos, random) -> {
@@ -918,7 +962,7 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 					</#if>
 			);
 			<#else>
-			SpawnPlacements.register(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(),
+			SpawnPlacements.register(${JavaModName}Entities.${REGISTRYNAME}.get(),
 					SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
 					<#if hasProcedure(data.spawningCondition)>
 					(entityType, world, reason, pos, random) -> {
@@ -937,11 +981,11 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 		</#if>
 
 		<#if data.spawnInDungeons>
-			DungeonHooks.addDungeonMob(${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(), 180);
+			DungeonHooks.addDungeonMob(${JavaModName}Entities.${REGISTRYNAME}.get(), 180);
 		</#if>
 
 		<#if data.mobBehaviourType == "Raider">
-		Raid.RaiderType.create("${registryname}", ${JavaModName}Entities.${data.getModElement().getRegistryNameUpper()}.get(), new int[]{0, ${data.raidSpawnsCount[0]}, ${data.raidSpawnsCount[1]}, ${data.raidSpawnsCount[2]}, ${data.raidSpawnsCount[3]}, ${data.raidSpawnsCount[4]}, ${data.raidSpawnsCount[5]}, ${data.raidSpawnsCount[6]}});
+		Raid.RaiderType.create("${registryname}", ${JavaModName}Entities.${REGISTRYNAME}.get(), new int[]{0, ${data.raidSpawnsCount[0]}, ${data.raidSpawnsCount[1]}, ${data.raidSpawnsCount[2]}, ${data.raidSpawnsCount[3]}, ${data.raidSpawnsCount[4]}, ${data.raidSpawnsCount[5]}, ${data.raidSpawnsCount[6]}});
 		</#if>
 	}
 
@@ -979,5 +1023,61 @@ public class ${name}Entity extends ${extendsClass} <#if data.ranged>implements R
 
 		return builder;
 	}
+
+	<#if data.sensitiveToVibration>
+		<#if data.vibrationalEvents?has_content>
+		@Override public TagKey<GameEvent> getListenableEvents() {
+			return TagKey.create(Registries.GAME_EVENT, new ResourceLocation("${data.getModElement().getRegistryName()}_can_listen"));
+		}
+		</#if>
+
+		public int getListenerRadius() {
+			<#if hasProcedure(data.vibrationSensitivityRadius)>
+				Level world = this.level;
+				double x = this.getX();
+				double y = this.getY();
+				double z = this.getZ();
+				Entity entity = this;
+				return (int) <@procedureOBJToNumberCode data.vibrationSensitivityRadius/>;
+			<#else>
+				return ${data.vibrationSensitivityRadius.getFixedValue()};
+			</#if>
+		}
+
+		@Override public boolean shouldListen(ServerLevel world, GameEventListener eventListener, BlockPos vibrationPos, GameEvent holder, GameEvent.Context context) {
+			<#if hasProcedure(data.canReceiveVibrationCondition)>
+				return <@procedureCode data.canReceiveVibrationCondition {
+					"x": "this.getX()",
+					"y": "this.getY()",
+					"z": "this.getZ()",
+					"vibrationX": "vibrationPos.getX()",
+					"vibrationY": "vibrationPos.getY()",
+					"vibrationZ": "vibrationPos.getZ()",
+					"world": "world",
+					"entity": "this",
+					"sourceentity": "context.sourceEntity()"
+				}/>
+			<#else>
+				return true;
+			</#if>
+		}
+
+		@Override public void onSignalReceive(ServerLevel world, GameEventListener eventListener, BlockPos vibrationPos, GameEvent holder, @Nullable Entity vibrationSource, @Nullable Entity projectileShooter, float distance) {
+			<#if hasProcedure(data.onReceivedVibration)>
+				<@procedureCode data.onReceivedVibration {
+					"x": "this.getX()",
+					"y": "this.getY()",
+					"z": "this.getZ()",
+					"vibrationX": "vibrationPos.getX()",
+					"vibrationY": "vibrationPos.getY()",
+					"vibrationZ": "vibrationPos.getZ()",
+					"world": "world",
+					"entity": "this",
+					"sourceentity": "vibrationSource",
+					"immediatesourceentity": "projectileShooter"
+				}/>
+			</#if>
+		}
+	</#if>
 }
 <#-- @formatter:on -->
