@@ -55,7 +55,7 @@ package ${package}.init;
 		</#if>
 	</#if>
 </#list>
-<#assign noteBlockInstrument = blocks?filter(block -> block.noteBlockInstrument != "harp")>
+<#assign noteBlockInstrument = blocks?filter(block -> block.noteBlockInstrument?? && block.noteBlockInstrument != "harp")>
 
 <#if noteBlockInstrument?size != 0>@Mod.EventBusSubscriber </#if>public class ${JavaModName}Blocks {
 
