@@ -48,10 +48,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 <#compress>
 public class ${name}Block extends
 	<#if data.hasGravity>
-		Falling
+		FallingBlock
 	<#elseif data.blockBase?has_content>
-		${data.blockBase?replace("Stairs", "Stair")?replace("Pane", "IronBars")}
-	</#if>Block
+		${data.blockBase?replace("Stairs", "Stair")?replace("Pane", "IronBars")}Block
+	<#else>
+		Block
+	</#if>
 
 	<#assign interfaces = []>
 	<#if data.isWaterloggable>
