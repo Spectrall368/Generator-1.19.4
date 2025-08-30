@@ -8,6 +8,6 @@
     "author": "_Spectrall",
     "dependencies":  [],
     "updateJSONURL": "https://raw.githubusercontent.com/Spectrall368/Generator-${version}/${mcreatorVersionShort}/update.json",
-    "pluginPageID": 118523
+    "pluginPageID": 105663
   }
 }
