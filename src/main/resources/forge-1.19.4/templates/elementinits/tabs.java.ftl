@@ -38,7 +38,7 @@
  */
 package ${package}.init;
 
-<#compress>
+<@javacompress>
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD) public class ${JavaModName}Tabs {
 
 	<#if customTabs?has_content>
@@ -73,5 +73,5 @@ package ${package}.init;
 	}
 	</#if>
 }
-</#compress>
+</@javacompress>
 <#-- @formatter:on -->
