@@ -262,7 +262,7 @@
 		"x": "entity.getX()",
 		"y": "entity.getY()",
 		"z": "entity.getZ()",
-		"world": "entity.level()",
+		"world": "entity.level",
 		"entity": "entity",
 		"itemstack": "entity.getItem()",
 		"damagesource": "damagesource"

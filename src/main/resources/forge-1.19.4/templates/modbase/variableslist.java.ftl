@@ -83,8 +83,8 @@ import ${package}.${JavaModName};
         <#if w.hasVariablesOfScope("GLOBAL_WORLD") || w.hasVariablesOfScope("GLOBAL_MAP")>
         @SubscribeEvent public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
             if (event.getEntity() instanceof ServerPlayer player) {
-                SavedData mapdata = MapVariables.get(player.level());
-                SavedData worlddata = WorldVariables.get(player.level());
+                SavedData mapdata = MapVariables.get(player.level);
+                SavedData worlddata = WorldVariables.get(player.level);
                 if(mapdata != null)
                     ${JavaModName}.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SavedDataSyncMessage(0, mapdata));
                 if(worlddata != null)
@@ -94,7 +94,7 @@ import ${package}.${JavaModName};
 
         @SubscribeEvent public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
             if (event.getEntity() instanceof ServerPlayer player) {
-                SavedData worlddata = WorldVariables.get(player.level());
+                SavedData worlddata = WorldVariables.get(player.level);
                 if(worlddata != null)
                     ${JavaModName}.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SavedDataSyncMessage(1, worlddata));
             }
