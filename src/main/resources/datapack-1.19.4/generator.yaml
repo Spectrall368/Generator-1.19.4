@@ -1,6 +1,6 @@
 name: Data Pack for Java Edition @minecraft
 status: deprecated
-buildfileversion: 45.4.2
+buildfileversion: 45.4.3
 
 # gradle task definitions
 gradle:

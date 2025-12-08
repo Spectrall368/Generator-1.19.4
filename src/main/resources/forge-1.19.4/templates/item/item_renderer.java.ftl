@@ -73,7 +73,7 @@ package ${package}.client.renderer.item;
 		<#list data.getModels() as model>
 			<#if model.hasCustomJAVAModel()>
 			if (<#list model.stateMap.entrySet() as entry>
-					ItemProperties.getProperty(itemstack, new ResourceLocation("${generator.map(entry.getKey().getPrefixedName(registryname + "_"), "itemproperties")}"))
+					ItemProperties.getProperty(itemstack.getItem(), new ResourceLocation("${generator.map(entry.getKey().getPrefixedName(registryname + "_"), "itemproperties")}"))
 						.call(itemstack, Minecraft.getInstance().level, Minecraft.getInstance().player, 0) >= ${entry.getValue()?is_boolean?then(entry.getValue()?then("1", "0"), entry.getValue())}
 				<#sep> && </#list>) {
 				model = models.get(${model?index + 1});
