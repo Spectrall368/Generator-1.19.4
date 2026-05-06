@@ -218,7 +218,7 @@ public class ${name}Item extends <#if data.hasBannerPatterns()>BannerPattern<#el
 				"x": "serverPlayer.getX()",
 				"y": "serverPlayer.getY()",
 				"z": "serverPlayer.getZ()",
-				"world": "serverPlayer.level()",
+				"world": "serverPlayer.level",
 				"entity": "serverPlayer",
 				"itemstack": "ar.getObject()"
 			}, false/>) {
