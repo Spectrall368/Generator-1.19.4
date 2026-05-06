@@ -62,7 +62,7 @@ package ${package}.init;
 <#assign has_chunks = chunks?size gt 1>
 <#assign noteBlockInstrument = blocks?filter(block -> block.noteBlockInstrument?? && block.noteBlockInstrument != "harp")>
 
-<#if signs?size != 0 || noteBlockInstrument?size != 0>@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)</#if>public class ${JavaModName}Blocks {
+<#if signs?size != 0>@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)</#if>public class ${JavaModName}Blocks {
 
 	public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create(ForgeRegistries.BLOCKS, ${JavaModName}.MODID);
 
@@ -143,15 +143,17 @@ package ${package}.init;
 	</#if>
 
 	<#if noteBlockInstrument?size != 0>
-	@SubscribeEvent public static void onNoteBlockPlay(NoteBlockEvent.Play event) {
-        <#compress>
-        Block below = event.getLevel().getBlockState(event.getPos().below()).getBlock();
-		<#list noteBlockInstrument as block>
-		if (below == ${JavaModName}Blocks.${block.getModElement().getRegistryNameUpper()}.get()) {
-            event.setInstrument(${generator.map(block.noteBlockInstrument, "noteblockinstruments")});
-        }<#sep>else
-		</#list>
-        </#compress>
+	@Mod.EventBusSubscriber public static class BlocksHandler {
+        @SubscribeEvent public static void onNoteBlockPlay(NoteBlockEvent.Play event) {
+            <#compress>
+            Block below = event.getLevel().getBlockState(event.getPos().below()).getBlock();
+            <#list noteBlockInstrument as block>
+            if (below == ${JavaModName}Blocks.${block.getModElement().getRegistryNameUpper()}.get()) {
+                event.setInstrument(${generator.map(block.noteBlockInstrument, "noteblockinstruments")});
+            }<#sep>else
+            </#list>
+            </#compress>
+        }
     }
 	</#if>
 
