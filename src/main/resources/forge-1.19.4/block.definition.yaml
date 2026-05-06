@@ -669,9 +669,6 @@ tags:
     condition: "blockBase %= HangingSign"
     entry: "CUSTOM:@NAME.wall"
 
-  - tag: BLOCKS:minecraft:replaceable
-    condition: isReplaceable
-    entryprovider: getProvidedBlocks()
   - tag: BLOCKS:minecraft:climbable
     condition: isLadder
     entryprovider: getProvidedBlocks()
