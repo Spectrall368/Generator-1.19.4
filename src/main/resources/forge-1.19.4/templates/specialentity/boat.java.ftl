@@ -65,7 +65,7 @@ public class ${JavaModName}Boat extends Boat {
 				"y": "this.getY()",
 				"z": "this.getZ()",
 				"entity": "this",
-				"world": "this.level()"
+				"world": "this.level"
 			}/>
 			}<#sep>else
 			</#list>
@@ -83,7 +83,7 @@ public class ${JavaModName}Boat extends Boat {
                 "z": "this.getZ()",
                 "entity": "this",
                 "sourceentity": "sourceentity",
-                "world": "this.level()"
+                "world": "this.level"
             }/>
 			}<#sep>else
 			</#list>

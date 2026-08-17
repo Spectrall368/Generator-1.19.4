@@ -62,7 +62,7 @@ public class ${JavaModName}ChestBoat extends ChestBoat {
 				"y": "this.getY()",
 				"z": "this.getZ()",
 				"entity": "this",
-				"world": "this.level()"
+				"world": "this.level"
 			}/>
 			}<#sep>else
 			</#list>
@@ -80,7 +80,7 @@ public class ${JavaModName}ChestBoat extends ChestBoat {
                 "z": "this.getZ()",
                 "entity": "this",
                 "sourceentity": "sourceentity",
-                "world": "this.level()"
+                "world": "this.level"
             }/>
 			}<#sep>else
 			</#list>

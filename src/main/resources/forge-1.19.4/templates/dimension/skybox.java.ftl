@@ -58,13 +58,13 @@ public class ${JavaModName}SkyboxRenderer {
 		if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) return;
 		<#list dimensions as dimension>
 			<#if dimension.enableCustomSkyboxTextures || dimension.enableCustomSunMoonTextures>
-				if (mc.player.level().dimension() == ${dimension.getModElement().getRegistryNameUpper()}) {
+				if (mc.player.level.dimension() == ${dimension.getModElement().getRegistryNameUpper()}) {
 					<#if dimension.enableCustomSkyboxTextures>
 						renderCustomSkybox(event, ${dimension.getModElement().getRegistryNameUpper()}_SKYBOX);
 					</#if>
 					<#if dimension.enableCustomSunMoonTextures>
-						renderCustomSun(event, mc.player.level(), ${dimension.getModElement().getRegistryNameUpper()}_SUN);
-						renderCustomMoon(event, mc.player.level(), ${dimension.getModElement().getRegistryNameUpper()}_MOON);
+						renderCustomSun(event, mc.player.level, ${dimension.getModElement().getRegistryNameUpper()}_SUN);
+						renderCustomMoon(event, mc.player.level, ${dimension.getModElement().getRegistryNameUpper()}_MOON);
 					</#if>
 				}
 			</#if>
