@@ -282,23 +282,6 @@
 </#macro>
 
 <#-- Block-related triggers -->
-<#macro onDestroyedByPlayer procedure="">
-<#if hasProcedure(procedure)>
-@Override public boolean onDestroyedByPlayer(BlockState blockstate, Level world, BlockPos pos, Player entity, boolean willHarvest, FluidState fluid) {
-	boolean retval = super.onDestroyedByPlayer(blockstate, world, pos, entity, willHarvest, fluid);
-	<@procedureCode procedure, {
-	"x": "pos.getX()",
-	"y": "pos.getY()",
-	"z": "pos.getZ()",
-	"world": "world",
-	"entity": "entity",
-	"blockstate": "blockstate"
-	}/>
-	return retval;
-}
-</#if>
-</#macro>
-
 <#macro onDestroyedByExplosion procedure="">
 <#if hasProcedure(procedure)>
 @Override public void wasExploded(Level world, BlockPos pos, Explosion e) {
@@ -347,72 +330,6 @@
 		"moving": "moving"
 		}/>
 	</#if>
-}
-</#if>
-</#macro>
-
-<#macro onEntityWalksOn procedure="">
-<#if hasProcedure(procedure)>
-@Override public void stepOn(Level world, BlockPos pos, BlockState blockstate, Entity entity) {
-	super.stepOn(world, pos, blockstate, entity);
-	<@procedureCode procedure, {
-	"x": "pos.getX()",
-	"y": "pos.getY()",
-	"z": "pos.getZ()",
-	"world": "world",
-	"entity": "entity",
-	"blockstate": "blockstate"
-	}/>
-}
-</#if>
-</#macro>
-
-<#macro onEntityFallsOn procedure="">
-<#if hasProcedure(data.onEntityFallsOn)>
-@Override public void fallOn(Level world, BlockState blockstate, BlockPos pos, Entity entity, float distance) {
-	super.fallOn(world, blockstate, pos, entity, distance);
-	<@procedureCode data.onEntityFallsOn, {
-		"x": "pos.getX()",
-		"y": "pos.getY()",
-		"z": "pos.getZ()",
-		"world": "world",
-		"entity": "entity",
-		"blockstate": "blockstate",
-		"distance": "distance"
-	}/>
-}
-</#if>
-</#macro>
-
-<#macro onBlockPlacedBy procedure="">
-<#if hasProcedure(procedure)>
-@Override public void setPlacedBy(Level world, BlockPos pos, BlockState blockstate, LivingEntity entity, ItemStack itemstack) {
-	super.setPlacedBy(world, pos, blockstate, entity, itemstack);
-	<@procedureCode procedure, {
-	"x": "pos.getX()",
-	"y": "pos.getY()",
-	"z": "pos.getZ()",
-	"world": "world",
-	"entity": "entity",
-	"blockstate": "blockstate",
-	"itemstack": "itemstack"
-	}/>
-}
-</#if>
-</#macro>
-
-<#macro onStartToDestroy procedure="">
-<#if hasProcedure(procedure)>
-@Override public void attack(BlockState blockstate, Level world, BlockPos pos, Player entity) {
-	super.attack(blockstate, world, pos, entity);
-	<@procedureCode procedure, {
-	"x": "pos.getX()",
-	"y": "pos.getY()",
-	"z": "pos.getZ()",
-	"world": "world",
-	"entity": "entity",
-	"blockstate": "blockstate"
-	}/>
 }
 </#if>
 </#macro>
@@ -486,6 +403,89 @@
 	<#if scheduleTick>
 	world.scheduleTick(pos, this, ${tickRate});
 	</#if>
+}
+</#if>
+</#macro>
+
+<#macro onDestroyedByPlayer procedure="">
+<#if hasProcedure(procedure)>
+@Override public boolean onDestroyedByPlayer(BlockState blockstate, Level world, BlockPos pos, Player entity, boolean willHarvest, FluidState fluid) {
+	boolean retval = super.onDestroyedByPlayer(blockstate, world, pos, entity, willHarvest, fluid);
+	<@procedureCode procedure, {
+	"x": "pos.getX()",
+	"y": "pos.getY()",
+	"z": "pos.getZ()",
+	"world": "world",
+	"entity": "entity",
+	"blockstate": "blockstate"
+	}/>
+	return retval;
+}
+</#if>
+</#macro>
+
+<#macro onEntityWalksOn procedure="">
+<#if hasProcedure(procedure)>
+@Override public void stepOn(Level world, BlockPos pos, BlockState blockstate, Entity entity) {
+	super.stepOn(world, pos, blockstate, entity);
+	<@procedureCode procedure, {
+	"x": "pos.getX()",
+	"y": "pos.getY()",
+	"z": "pos.getZ()",
+	"world": "world",
+	"entity": "entity",
+	"blockstate": "blockstate"
+	}/>
+}
+</#if>
+</#macro>
+
+<#macro onEntityFallsOn procedure="">
+<#if hasProcedure(data.onEntityFallsOn)>
+@Override public void fallOn(Level world, BlockState blockstate, BlockPos pos, Entity entity, float distance) {
+	super.fallOn(world, blockstate, pos, entity, distance);
+	<@procedureCode data.onEntityFallsOn, {
+		"x": "pos.getX()",
+		"y": "pos.getY()",
+		"z": "pos.getZ()",
+		"world": "world",
+		"entity": "entity",
+		"blockstate": "blockstate",
+		"distance": "distance"
+	}/>
+}
+</#if>
+</#macro>
+
+<#macro onBlockPlacedBy procedure="">
+<#if hasProcedure(procedure)>
+@Override public void setPlacedBy(Level world, BlockPos pos, BlockState blockstate, LivingEntity entity, ItemStack itemstack) {
+	super.setPlacedBy(world, pos, blockstate, entity, itemstack);
+	<@procedureCode procedure, {
+	"x": "pos.getX()",
+	"y": "pos.getY()",
+	"z": "pos.getZ()",
+	"world": "world",
+	"entity": "entity",
+	"blockstate": "blockstate",
+	"itemstack": "itemstack"
+	}/>
+}
+</#if>
+</#macro>
+
+<#macro onStartToDestroy procedure="">
+<#if hasProcedure(procedure)>
+@Override public void attack(BlockState blockstate, Level world, BlockPos pos, Player entity) {
+	super.attack(blockstate, world, pos, entity);
+	<@procedureCode procedure, {
+	"x": "pos.getX()",
+	"y": "pos.getY()",
+	"z": "pos.getZ()",
+	"world": "world",
+	"entity": "entity",
+	"blockstate": "blockstate"
+	}/>
 }
 </#if>
 </#macro>
